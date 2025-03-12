@@ -1,0 +1,22 @@
+[package]
+name = "curve-cs2-v1"
+version = "0.1.0"
+edition = "2021"
+description = "Defines the curve calcs adaptor for the curve: cs2 => price= (c)onstant * (s)upply^(2)"
+
+[dependencies]
+scrypto = { version = "1.3.0" }
+scrypto-interface = { path = "../../libraries/scrypto-interface" }
+curve-calcs-interface = { path = "../../libraries/curve-calcs-interface" }
+
+[dev-dependencies]
+radix-engine-interface = { version = "1.3.0" }
+
+
+[features]
+default = []
+test = []
+
+[lib]
+crate-type = ["cdylib", "lib"]
+

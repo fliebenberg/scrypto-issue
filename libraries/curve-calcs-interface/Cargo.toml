@@ -1,0 +1,28 @@
+[package]
+name = "curve-calcs-interface"
+version = "0.1.0"
+edition = "2021"
+description = "Defines the interface for the curve-calcs adaptors."
+
+[dependencies]
+scrypto = { version = "1.3.0" }
+radix-engine-interface = { version = "1.3.0" }
+scrypto-interface = { path = "../scrypto-interface" }
+sbor = { version = "1.3.0" }
+radix-engine = { version = "1.3.0" }
+radix-common = { version = "1.3.0" }
+
+[features]
+default = [
+    "trait",
+    "scrypto-stubs",
+    "scrypto-test-stubs",
+    "manifest-builder-stubs",
+]
+trait = []
+scrypto-stubs = []
+scrypto-test-stubs = []
+manifest-builder-stubs = []
+
+[lib]
+crate-type = ["cdylib", "lib"]
