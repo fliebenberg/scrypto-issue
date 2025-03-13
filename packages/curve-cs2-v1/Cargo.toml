@@ -6,12 +6,9 @@ description = "Defines the curve calcs adaptor for the curve: cs2 => price= (c)o
 
 [dependencies]
 scrypto = { version = "1.3.0" }
+radix-common = { version = "1.3.0" }
 scrypto-interface = { path = "../../libraries/scrypto-interface" }
 curve-calcs-interface = { path = "../../libraries/curve-calcs-interface" }
-
-[dev-dependencies]
-radix-engine-interface = { version = "1.3.0" }
-
 
 [features]
 default = []

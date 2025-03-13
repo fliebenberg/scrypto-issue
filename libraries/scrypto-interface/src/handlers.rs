@@ -25,9 +25,7 @@ use syn::*;
 
 use crate::types::{Signature, *};
 
-pub fn handle_define_interface(
-    input: TokenStream2,
-) -> syn::Result<TokenStream2> {
+pub fn handle_define_interface(input: TokenStream2) -> syn::Result<TokenStream2> {
     let define_interface = parse2::<DefineInterfaceInput>(input)?;
 
     let generate = define_interface
@@ -51,17 +49,17 @@ pub fn handle_define_interface(
     } in generate
     {
         match generate {
-            Generate::Trait => {
-                generated.push(generate_trait(&define_interface, &attributes))
+            Generate::Trait => generated.push(generate_trait(&define_interface, &attributes)),
+            Generate::ScryptoStub => {
+                generated.push(generate_scrypto_stub(&define_interface, &attributes))
             }
-            Generate::ScryptoStub => generated
-                .push(generate_scrypto_stub(&define_interface, &attributes)),
-            Generate::ScryptoTestStub => generated.push(
-                generate_scrypto_test_stub(&define_interface, &attributes),
-            ),
-            Generate::ManifestBuilderStub => generated.push(
-                generate_manifest_builder_stub(&define_interface, &attributes)?,
-            ),
+            Generate::ScryptoTestStub => {
+                generated.push(generate_scrypto_test_stub(&define_interface, &attributes))
+            }
+            Generate::ManifestBuilderStub => generated.push(generate_manifest_builder_stub(
+                &define_interface,
+                &attributes,
+            )?),
         };
     }
 
@@ -70,10 +68,7 @@ pub fn handle_define_interface(
     ))
 }
 
-fn generate_trait(
-    input: &DefineInterfaceInput,
-    attributes: &[Attribute],
-) -> TokenStream2 {
+fn generate_trait(input: &DefineInterfaceInput, attributes: &[Attribute]) -> TokenStream2 {
     let struct_ident = input.struct_ident();
     let trait_ident = format_ident!("{}InterfaceTrait", struct_ident);
 
@@ -107,10 +102,7 @@ fn generate_trait(
     )
 }
 
-fn generate_scrypto_stub(
-    input: &DefineInterfaceInput,
-    attributes: &[Attribute],
-) -> TokenStream2 {
+fn generate_scrypto_stub(input: &DefineInterfaceInput, attributes: &[Attribute]) -> TokenStream2 {
     let struct_ident = input.struct_ident();
     let struct_ident = format_ident!("{}InterfaceScryptoStub", struct_ident);
     let blueprint_ident = &input.blueprint_ident;
@@ -258,8 +250,7 @@ fn generate_scrypto_test_stub(
     attributes: &[Attribute],
 ) -> TokenStream2 {
     let struct_ident = input.struct_ident();
-    let struct_ident =
-        format_ident!("{}InterfaceScryptoTestStub", struct_ident);
+    let struct_ident = format_ident!("{}InterfaceScryptoTestStub", struct_ident);
     let blueprint_ident = &input.blueprint_ident;
 
     let try_from_impl = [
@@ -351,8 +342,8 @@ fn generate_scrypto_test_stub(
                     #[allow(clippy::too_many_arguments)]
                     pub #token_fn #ident <Y, E> ( #arguments ) -> Result<#rtn, E>
                     where
-                        Y: ::radix_engine_interface::prelude::SystemApi<E>,
-                        E: ::core::fmt::Debug + ::radix_engine_interface::prelude::SystemApiError
+                        Y: ::scrypto::api::SystemApi<E>,
+                        E: ::core::fmt::Debug + ::scrypto::api::SystemApiError
                     {
                         #inner
                     }
@@ -416,8 +407,7 @@ fn generate_manifest_builder_stub(
     attributes: &[Attribute],
 ) -> syn::Result<TokenStream2> {
     let struct_ident = input.struct_ident();
-    let trait_ident =
-        format_ident!("{}InterfaceManifestBuilderExtensionTrait", struct_ident);
+    let trait_ident = format_ident!("{}InterfaceManifestBuilderExtensionTrait", struct_ident);
     let blueprint_ident = &input.blueprint_ident;
 
     let signatures = input
@@ -475,9 +465,7 @@ fn generate_manifest_builder_stub(
                 let inner = if arguments.is_function() {
                     arguments.add_argument_to_beginning(
                         Ident::new("blueprint_package_address", ident.span()),
-                        parse_quote!(
-                            ::radix_common::prelude::PackageAddress
-                        ),
+                        parse_quote!(::radix_common::prelude::PackageAddress),
                     );
 
                     let original_arguments = original_arguments
@@ -497,9 +485,7 @@ fn generate_manifest_builder_stub(
                 } else {
                     arguments.add_argument_to_beginning(
                         Ident::new("component_address", ident.span()),
-                        parse_quote!(
-                            impl ::transaction::builder::ResolvableGlobalAddress
-                        ),
+                        parse_quote!(impl ::transaction::builder::ResolvableGlobalAddress),
                     );
 
                     let original_arguments = original_arguments
@@ -517,11 +503,8 @@ fn generate_manifest_builder_stub(
                     }
                 };
 
-                let fn_ident = format_ident!(
-                    "{}_{}",
-                    struct_ident.to_string().to_snake_case(),
-                    ident
-                );
+                let fn_ident =
+                    format_ident!("{}_{}", struct_ident.to_string().to_snake_case(), ident);
 
                 let arguments = arguments.manifest_arguments()?;
                 Ok(quote! {
@@ -551,25 +534,21 @@ fn generate_manifest_builder_stub(
     ))
 }
 
-pub fn handle_blueprint_with_traits(
-    _: TokenStream2,
-    item: TokenStream2,
-) -> Result<TokenStream2> {
+pub fn handle_blueprint_with_traits(_: TokenStream2, item: TokenStream2) -> Result<TokenStream2> {
     // Parse the passed token stream as a module. After we do that, we will
     // remove all of the trait impls from inside.
     let span = item.span();
     let mut module = syn::parse2::<ItemMod>(item)?;
     let trait_impls = if let Some((brace, items)) = module.content {
-        let (trait_impls, items) =
-            items.into_iter().partition::<Vec<_>, _>(|item| {
-                matches!(
-                    item,
-                    Item::Impl(ItemImpl {
-                        trait_: Some(_),
-                        ..
-                    })
-                )
-            });
+        let (trait_impls, items) = items.into_iter().partition::<Vec<_>, _>(|item| {
+            matches!(
+                item,
+                Item::Impl(ItemImpl {
+                    trait_: Some(_),
+                    ..
+                })
+            )
+        });
         module.content = Some((brace, items));
         trait_impls
     } else {
@@ -582,9 +561,7 @@ pub fn handle_blueprint_with_traits(
         let impl_item = items
             .iter_mut()
             .filter_map(|item| {
-                if let Item::Impl(item_impl @ ItemImpl { trait_: None, .. }) =
-                    item
-                {
+                if let Item::Impl(item_impl @ ItemImpl { trait_: None, .. }) = item {
                     Some(item_impl)
                 } else {
                     None
@@ -618,8 +595,7 @@ pub fn handle_blueprint_with_traits(
                         item.vis = Visibility::Public(Token![pub](span));
                         ImplItem::Type(item)
                     }
-                    item @ ImplItem::Macro(..)
-                    | item @ ImplItem::Verbatim(..) => item,
+                    item @ ImplItem::Macro(..) | item @ ImplItem::Verbatim(..) => item,
                     _ => todo!(),
                 })
                 .collect::<Vec<_>>();
@@ -661,10 +637,8 @@ pub fn handle_blueprint_with_traits(
                     .items
                     .into_iter()
                     .map(|mut impl_item| {
-                        if let ImplItem::Fn(ref mut func_impl_item) = impl_item
-                        {
-                            func_impl_item.block =
-                                parse_quote!({ unreachable!() });
+                        if let ImplItem::Fn(ref mut func_impl_item) = impl_item {
+                            func_impl_item.block = parse_quote!({ unreachable!() });
                         };
                         impl_item
                     })
@@ -875,9 +849,7 @@ mod test {
         "#;
 
         // Act
-        let rtn = handle_define_interface(
-            TokenStream2::from_str(define_interface).unwrap(),
-        );
+        let rtn = handle_define_interface(TokenStream2::from_str(define_interface).unwrap());
 
         // Assert
         rtn.expect("Interface has been defined successfully!");
