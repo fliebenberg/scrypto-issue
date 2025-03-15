@@ -2,7 +2,10 @@
 resolver = "2"
 
 members = [
-  "packages/curve-cs2-v1"
+  "packages/curve-cs2-v1",
+  "packages/dex-ociswap-v1",
+  "packages/dex-ociswap-v2",
+  "packages/main"
 ]
 
 [profile.release]

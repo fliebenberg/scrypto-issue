@@ -1,0 +1,167 @@
+// Create new DexOciswapAdaptor component (No Owner)
+CALL_FUNCTION
+  Address("package_tdx_2_1pk8yv5a37t8pj5ggmr4ykuhtuwq4h62ejzjtsla03zh59p4ggp5ra4")
+  "DexOciswapAdaptor"
+  "new"
+  "oci"
+  Address("component_tdx_2_1cz3pzxmwf7ywxs5tse84vaknm26s9glh38k700ucj593v4vgllyp5g")
+  Address("account_tdx_2_12yhfrtak5j0pmaju5l3p752wpye4z4nzua679ypns0094hmu66p2yk")
+  Enum<2u8>(
+    Enum<0u8>()
+  )
+  Enum<0u8>()
+;
+
+// Create new DexOciswapAdaptor component (With Owner)
+CALL_FUNCTION
+  Address("package_tdx_2_1p5xydtzczxknue4yrwxmc3gmenycn08hxnjsxhya9yr6pprjr73jm7")
+  "DexOciswapAdaptor"
+  "new"
+  "oci"
+  Address("component_tdx_2_1cz3pzxmwf7ywxs5tse84vaknm26s9glh38k700ucj593v4vgllyp5g")
+  Address("account_tdx_2_12yhfrtak5j0pmaju5l3p752wpye4z4nzua679ypns0094hmu66p2yk")
+  Enum<2u8>(
+    Enum<2u8>(
+      Enum<0u8>(
+        Enum<0u8>(
+          Enum<1u8>(
+            Address("resource_tdx_2_1thyftl364ln25dfl5qt92ayj3k2q3z69f3s05hwwd7nr8szrj3ka25")
+          )
+        )
+      )
+    )
+  )
+  Enum<0u8>()
+;
+
+
+// Add a new liquidity pool
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "withdraw"
+  Address("resource_tdx_2_1thethph9sc3kyzp9tgm63mpmhfyv0awpeeccq2ymyq9eq5m9rpa65u")
+  Decimal("100")
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("resource_tdx_2_1thethph9sc3kyzp9tgm63mpmhfyv0awpeeccq2ymyq9eq5m9rpa65u")
+  Bucket("token_bucket")
+;
+
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "withdraw"
+  Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
+  Decimal("100")
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
+  Bucket("xrd_bucket")
+;
+
+CALL_METHOD
+  Address("component_tdx_2_1cr926v2pha46anhn22nse6fvk4xasuma05dskqr5xl9jwn7f638625")
+  "create_listing"
+  Bucket("token_bucket")
+  Bucket("xrd_bucket")
+;
+
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;
+
+
+// Buy token from pool
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "withdraw"
+  Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
+  Decimal("5")
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
+  Bucket("xrd_bucket")
+;
+
+CALL_METHOD
+  Address("component_tdx_2_1cp3pa40v9jrllfzesa46fp4cy3pqjxlgx48dlya7ywsgm7tfkms9ds")
+  "swap"
+  Bucket("xrd_bucket")
+;
+
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;
+
+
+// Add liquidity to pool
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "withdraw"
+  Address("resource_tdx_2_1t5lk6kxtp0uawmqkzy5uxsr80u38yvpu5x5fscdjhs3zdkt8qn2nes")
+  Decimal("5")
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("resource_tdx_2_1t5lk6kxtp0uawmqkzy5uxsr80u38yvpu5x5fscdjhs3zdkt8qn2nes")
+  Bucket("token_bucket")
+;
+
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "withdraw"
+  Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
+  Decimal("7")
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc")
+  Bucket("xrd_bucket")
+;
+
+CALL_METHOD
+  Address("component_tdx_2_1cr926v2pha46anhn22nse6fvk4xasuma05dskqr5xl9jwn7f638625")
+  "add_liquidity"
+  Address("component_tdx_2_1czv6p2cuqejndqek4p2f8hkf6qrh37rxt9d7c0e4q7400zuklq4dcc")
+  Bucket("token_bucket")
+  Bucket("xrd_bucket")
+;
+
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;
+
+
+// Remove liquidity from pool
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "withdraw"
+  Address("resource_tdx_2_1t54s7dxlkn30w3uxhpt2dp7h3lk78ness0tt9u7sfcqnul474yw0ha")
+  Decimal("5")
+;
+
+TAKE_ALL_FROM_WORKTOP
+  Address("resource_tdx_2_1t54s7dxlkn30w3uxhpt2dp7h3lk78ness0tt9u7sfcqnul474yw0ha")
+  Bucket("token_bucket")
+;
+
+CALL_METHOD
+  Address("component_tdx_2_1cr926v2pha46anhn22nse6fvk4xasuma05dskqr5xl9jwn7f638625")
+  "remove_liquidity"
+  Address("component_tdx_2_1czv6p2cuqejndqek4p2f8hkf6qrh37rxt9d7c0e4q7400zuklq4dcc")
+  Bucket("token_bucket")
+;
+
+CALL_METHOD
+  Address("account_tdx_2_128ntdeqsshu3a8xpmyrf6asur4dxykhar9ms936s840fagslm3hetq")
+  "deposit_batch"
+  Expression("ENTIRE_WORKTOP")
+;

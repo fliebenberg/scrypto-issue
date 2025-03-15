@@ -1,8 +1,8 @@
 [package]
-name = "curve-calcs-interface"
+name = "dex-interface"
 version = "0.1.0"
 edition = "2021"
-description = "Defines the interface for the curve-calcs adaptors."
+description = "Defines the interface for the dex adaptors."
 
 [dependencies]
 scrypto = { version = "1.3.0" }
